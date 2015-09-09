@@ -15,8 +15,10 @@ PROGRAM fftlog_f90
 	REAL ( KIND = 8 ), PARAMETER :: PI=3.141592653589793238462643383279502884197d0, CONSTANT=1/(2*PI*PI)
 !	xx and yy will contain input; after FFTL has been called, they will contain output (if INTERPOLATION = 0)
 	REAL ( KIND = 8 ), DIMENSION(:), ALLOCATABLE :: xx, yy, yy_second_derivative, yy_interp, wsave
-	REAL ( KIND = 8 ) :: xx_inf_limit = -1d300, xx_sup_limit = 1d300, dln_xx, dlog_xx, log_xmedian, log_xxmedian, log_xxmax, log_xxmin, rk, kr, mu, CENTRAL_INDEX, q, x, temp1, temp2
-	INTEGER :: N_ARGUMENTS, DIRECTION, KR_OPTION, UNIT, error, N_INFILE=0, N_USED=0, FIRST_USED_INDEX = 0, LAST_USED_INDEX=0, N_OUTFILE=0, i=0
+	REAL ( KIND = 8 ) :: xx_inf_limit = -1d300, xx_sup_limit = 1d300, dln_xx, dlog_xx, log_xmedian,&
+                       &log_xxmedian, log_xxmax, log_xxmin, rk, kr, mu, CENTRAL_INDEX, q, x, temp1, temp2
+	INTEGER :: N_ARGUMENTS, DIRECTION, KR_OPTION, UNIT, error, N_INFILE=0, N_USED=0, FIRST_USED_INDEX = 0,&
+             &LAST_USED_INDEX=0, N_OUTFILE=0, i=0
 	LOGICAL :: INTERPOLATION = .FALSE., FFT_OK
 	CHARACTER(512) :: input_filename, output_filename
 	CHARACTER(128) :: buffer
@@ -93,7 +95,8 @@ PROGRAM fftlog_f90
 	ELSE
 		INTERPOLATION = .TRUE.
 	END IF		
-    IF ( (N_USED > N_MAX) .OR. (N_OUTFILE > N_MAX) ) STOP "The number you specified or the number of elements of the input file are greater that N_MAX"
+    IF ( (N_USED > N_MAX) .OR. (N_OUTFILE > N_MAX) ) &
+    &STOP "The number you specified or the number of elements of the input file are greater that N_MAX"
 
 !	It is now safe to allocate memory to the arrays
 	ALLOCATE( xx(N_USED), yy(N_USED), yy_second_derivative(N_USED) )

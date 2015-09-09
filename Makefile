@@ -1,12 +1,12 @@
 ## Makefile for FFTLog-f90 (https://github.com/coccoinomane/fftlog-f90)
 
-# Settings for ifort by Intel
-F90 = ifort
-F90FLAG S =-fast -par-report0 -vec-report0 -parallel -xsse4.1 -w -arch i386
-
 # Settings for gfortran
-# F90=gfortran
-# F90FLAGS=-O2 -ftree-vectorize -ffast-math
+F90 = gfortran
+F90FLAGS = -O2 -ftree-vectorize -ffast-math -fimplicit-none 
+
+# Settings for ifort by Intel
+# F90 = ifort
+# F90FLAGS = -fast -par-report0 -vec-report0 -parallel -xsse4.1 -w -arch i386
 
 COMPILE = $(F90) $(F90FLAGS)
 
