@@ -1,48 +1,63 @@
-FFTLog-f90 is the Fortran 90 version of [FFTLog], a Fortran 77 code by [Andrew Hamilton] to compute the Fourier-Bessel, or Hankel, transform of a periodic sequence of logarithmically spaced points.
+## DESCRIPTION
+
+FFTLog-f90 is the Fortran 90 version of [FFTLog], a Fortran 77 code by Andrew Hamilton to compute the Fourier-Bessel, or Hankel, transform of a series of logarithmically spaced points.
+
+The main reference for the algorithm is [Andrew Hamilton's webpage]. He first introduced FFTLog in a [paper] on the nonlinearities in the cosmological structures.
+
+The Fourier-Bessel, or Hankel, transform F(r) of a function f(k) is defined as in eq. 159 of Hamilton's paper:
+
+            /
+    F(r) =  | dk * k * J_mu(k*r) * f(k)
+            /
+
+where `J_mu(k*r)` is the Bessel function of order mu. 
+
+IMPORTANT: Currently, FFTLog-f90 only supports the sine transform (mu=0.5) and returns the following integral:
+
+               1       /             sin(k*r)
+    F(r) = ----------  | dk * k^2 * --------- * f(k) .
+            (2*pi)^2   /               k*r
+
+If f(k) = P(k) is the power spectrum of a homogeneous 3D random field, then the integral will yield the two-point correlation function xi(r), as in eq. 3.104 of my [PhD Thesis].
+
 
 ## QUICK START
-To use FFTLog-f90:
+
+Do the following to produce your first result with FFTLog-f90:
 
 1. Customise the Makefile to use your preferred Fortran compiler.
 
 2. Run `make fftlog-f90`.
 
-3. If you use parallelisation with iFort, make sure to place the file `libiomp5.dylib` either in your $PATH or in the working directory; you can find said file in your ifort folder, usually `/opt/intel/` in a Unix system.
+3. Execute `./fftlog-f90 pk.dat xi.dat`. This will compute the Fourier transform of the function tabulated in `pk.dat` and store the result in `xi.dat`.
 
-4. To run a quick test of FFTLog-f90, execute the command `./fftlog-f90 p_kappa.dat xi.dat`, which computes the Fourier transform of the function contained in `p_kappa.dat`. This is the power spectrum P(k) of the matter field in our Universe, estimated using the [CLASS] code for the standard LCDM cosmological model. The Fourier transform of P(k) is the correlation function xi(r), which will be stored in the file `xi.dat` and will have the domain 1/k_max < r < 1/k_min. The results at the edges should not be trusted; see the documentation of [FTTLog] for further details.
+You can then compare with the expected result in `xi_ref.dat` by plotting them in [Gnuplot], with `set log; plot [0.01:1e4] "xi.dat" u 1:(abs($2)) w li, "xi_ref.dat" u 1:(abs($2)) w li`. 
 
-5. You can then plot the result in [Gnuplot] with `set log; plot [0.01:1e4] "xi.dat" u 1:(abs($2)) w li`. The feature at r~120 Mpc is called the baryon acoustic peak; you can zoom in it with `unset log; plot [80:180] "xi.dat" u 1:2 w li`.
+The `pk.dat` file contains the power spectrum P(k) of the matter distribution in our Universe. It is estimated using the [CLASS code] for a standard LCDM cosmological model. Its Fourier transform in `xi.dat` is the correlation function xi(r), computed using eq. 3.104 of my [PhD thesis]. The range of r in `xi.dat` is [1/k_max, 1/k_min]. The results at the edges should not be trusted; see the documentation of [FFTLog] for further details. The feature at r~120 Mpc is called the baryon acoustic peak; you can zoom in it with `unset log; plot [80:180] "xi.dat" u 1:2 w li`.
 
-The function supports spline integration of the result with the syntax
+FFTLog-f90 supports spline integration of the input and output files using the syntax
 
     ./fftlog-f90 in.dat out.dat N_POINTS
 
 where `N_POINTS` is the number of points you want in the output file. For example, with
 
-    ./fftlog-f90 p_kappa.dat xi_splined.dat 2000
+    ./fftlog-f90 pk.dat xi_splined.dat 2000
 
 the peak is much smoother:
 
     unset log; plot [80:180] "xi_splined.dat" u 1:2 w li
 
-FFTLog-f90 also supports custom integration ranges and arbitrary Bessel order. Refer to the usage message in the file `fftlog_driver.f90` for more details:
-
-& "I will calculate the Fourier Bessel integral of the input file&
-& for various values of frequency. Please give input_filename and output_filename as arguments.&
-& If a positive number is provided as the third argument (N_OUTFILE), the output file will contain&
-& that many lines; these extra points are generated using spline interpolation.&
-& 4th optional argument is the bessel function order (default = 0.5, that is sine);&
-& 5th optional argument is the bias (default = 0.0);&
-& 6th & 7th optional arguments are inf and sup integration limits (default is the whole file domain).&
-& If you do not want interpolation, just insert a value <= 0 as third argument.&
-& The reference for the FFTlog algorithm by Andrew Hamilton can be found here&
-& http://casa.colorado.edu/~ajsh/FFTLog"
+Please refer to the documentation in `fftlog_driver.f90` for the full description of the features and arguments of FFTLog-f90.
 
 
 ## CONTRIBUTE
+
 Please feel free to improve FFTLog-f90. You can do so via the Github project page: <https://github.com/coccoinomane/fftlog-f90>. Fork the repository, make your modifications and send a pull request.
 
-          
+
 [FFTLog]: http://casa.colorado.edu/~ajsh/FFTLog
-[Andrew Hamilton]: http://casa.colorado.edu/~ajsh
+[Andrew Hamilton's webpage]: http://casa.colorado.edu/~ajsh
+[paper]: http://xxx.lanl.gov/abs/astro-ph/9905191
 [Gnuplot]: http://www.gnuplot.info/
+[CLASS code]: http://class-code.net/
+[PhD Thesis]: http://arxiv.org/abs/1405.2280
